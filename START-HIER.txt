@@ -1,0 +1,48 @@
+Siri AI EU Recovery – Startanleitung
+=====================================
+
+1. Entpacke die ZIP-Datei in deinen Downloads-Ordner.
+
+2. Falls macOS die .command-Datei nicht per Doppelklick ausführen lässt,
+   öffne Terminal und kopiere diesen Befehl hinein:
+
+chmod +x "$HOME/Downloads/Siri-AI-EU-Recovery/Siri-AI-EU-Recovery.command"
+
+3. Danach kannst du
+   "Siri-AI-EU-Recovery.command"
+   im Finder per Doppelklick starten.
+
+Falls du den entpackten Ordner an einen anderen Ort verschoben hast:
+Tippe im Terminal
+
+chmod +x 
+
+(mit Leerzeichen am Ende), ziehe anschließend die .command-Datei aus
+dem Finder in das Terminalfenster und drücke Enter.
+
+Wichtige Voraussetzungen
+-------------------------
+- Apple-Silicon-Mac
+- macOS 27.x
+- Die System-App "/System/Applications/Siri AI.app" muss vorhanden sein.
+- Verifiziert wurde der Ablauf auf macOS 27.0.1, Build 26A434.
+- Das Skript benötigt Administratorrechte und fragt deshalb nach dem
+  macOS-Administratorpasswort.
+- Das Skript setzt die macOS-Oberflächensprache am Ende auf Deutsch.
+- Siri selbst bleibt für den verifizierten Eligibility-Pfad auf en-US.
+
+Was das Skript NICHT verändert
+------------------------------
+- SIP
+- /System
+- WARP / Surge / DNS / VPN
+- networkserviceproxy / privatecloudcomputed
+- Es schreibt Eligibility-Antworten nicht manuell auf 4.
+
+Hinweis
+-------
+Nach einem macOS-Neustart kann die Eligibility erneut zurückfallen.
+Dann die .command-Datei erneut ausführen. Falls die lokale Freischaltung
+erfolgreich ist, Siri AI aber noch nicht sofort Cloud-Anfragen beantwortet,
+den Mac online und wach lassen; Apples Assets/PCC/Privacy-Relay können
+nach einem Boot noch etwas Zeit benötigen.

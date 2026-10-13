@@ -1,0 +1,11 @@
+# Bewusste Allowlist: Diagnosen, Logs, Backups und Archive bleiben unversioniert.
+# Neue öffentliche Dateien müssen hier ausdrücklich freigegeben werden.
+*
+!/.gitignore
+!/README.md
+!/LICENSE
+!/START-HIER.txt
+!/Siri-AI-EU-Recovery.command
+!/docs/
+!/docs/TECHNICAL.md
+!/docs/VALIDATION.md
