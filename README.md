@@ -1,113 +1,119 @@
 # Siri AI EU macOS Recovery
 
-Eine lokale Recovery für Siri AI auf Apple-Silicon-Macs mit macOS 27.x in einem normalerweise nicht freigeschalteten Sprach-/Regionszustand. Der im Projekt reproduzierte Ablauf belässt Siri auf `en-US`, berechnet Eligibility vorübergehend mit Englisch als primärer Systemsprache und setzt macOS sowie die Siri-AI-Oberfläche anschließend auf Deutsch.
+**Language:** English | [Deutsch](README.de.md)
 
-Die finale `Siri-AI-EU-Recovery.command` wird unverändert aus dem verifizierten Projektstand veröffentlicht. Das Repository enthält ausschließlich Skript und Dokumentation; persönliche Diagnosen und Forschungsdaten sind ausgeschlossen.
+A local recovery for Siri AI on Apple Silicon Macs running macOS 27.x in a language/region configuration that is normally ineligible. The procedure reproduced in this project keeps Siri on `en-US`, temporarily recalculates eligibility with English as the primary system language, and then sets macOS and the Siri AI interface to German.
 
-**Inoffizielles Community-Projekt, ohne Verbindung zu Apple.** Interne Dienste, Schlüssel und Benachrichtigungen können sich ändern. Für zukünftige macOS-Versionen oder andere Geräte-/Accountzustände gibt es keine Funktionsgarantie.
+The final `Siri-AI-EU-Recovery.command` is published unchanged from the verified project version. This repository contains only the script and documentation; personal diagnostics and research data are excluded.
 
-## Voraussetzungen und Kompatibilität
+**Unofficial community project, unaffiliated with Apple.** Internal services, keys, and notifications may change. There is no guarantee that this procedure will work on future macOS versions or different device/account configurations.
 
-| Voraussetzung | Umfang |
+## Requirements and compatibility
+
+| Requirement | Scope |
 | --- | --- |
-| Hardware | Apple Silicon; das Skript verlangt `arm64` |
-| Betriebssystem | macOS `27.x`; andere Hauptversionen werden abgewiesen |
-| Im lokalen Projekt verifiziert | **macOS 27.0.1, Build 26A434** |
-| System-App | `/System/Applications/Siri AI.app` muss bereits vorhanden sein |
-| Berechtigungen | Angemeldeter macOS-Benutzer mit Zugriff auf `sudo` |
-| Zielkonfiguration | macOS Deutsch, Siri `en-US`, Siri AI / `com.apple.campo` Deutsch |
-| Foundation-Prüfung | Funktionierende Swift-Toolchain, falls `/usr/bin/swift` ausführbar vorhanden ist |
+| Hardware | Apple Silicon; the script requires `arm64` |
+| Operating system | macOS `27.x`; other major versions are rejected |
+| Verified in the local project | **macOS 27.0.1, build 26A434** |
+| System app | `/System/Applications/Siri AI.app` must already exist |
+| Permissions | Signed-in macOS user with access to `sudo` |
+| Final configuration | macOS in German, Siri on `en-US`, Siri AI / `com.apple.campo` in German |
+| Foundation check | Working Swift toolchain if an executable `/usr/bin/swift` is present |
 
-Der Preflight akzeptiert andere 27.x-Builds mit Hinweis. Diese wurden dadurch **nicht** verifiziert. Intel-Macs, andere Hauptversionen, andere Sprachkombinationen und abweichende Geräte-/Accountzustände sind nicht als kompatibel bestätigt. Das Skript installiert weder die System-App noch Modelle und garantiert keine Verfügbarkeit von Apples Cloud-Diensten.
+Preflight accepts other 27.x builds with a notice. This does **not** verify their compatibility. Intel Macs, other major versions, other language combinations, and different device/account configurations have not been confirmed compatible. The script installs neither the system app nor models and does not guarantee availability of Apple's cloud services.
 
-Die Abschlusskonfiguration ist fest vorgegeben: `de-DE, en-US, en-DE`. Das Skript speichert und rekonstruiert keine beliebige vorherige Sprachkonfiguration. Notiere deine bisherigen Spracheinstellungen, wenn du später dorthin zurückkehren möchtest.
+The final language list is fixed: `de-DE, en-US, en-DE`. The script does not save and reconstruct an arbitrary previous language configuration. Record your current language settings if you want to return to them later.
 
-## Quick Start
+## Quick start
 
-1. Lade im Bereich [Releases](https://github.com/mattisklein/siri-ai-eu-macos-recovery/releases) die Datei `Siri-AI-EU-Recovery-FINAL.zip` herunter und entpacke sie in Downloads.
-2. Lies das Skript und diese Hinweise, schließe laufende Siri-AI-Aufgaben und starte immer nur einen Recovery-Lauf.
-3. Öffne Terminal und führe aus:
+Short instructions: [English](START-HERE.txt) | [Deutsch](START-HIER.txt).
+
+Choosing a guide language does not change any system settings. The recovery's console messages remain in German; its fixed final configuration is macOS/Siri AI in German and Siri on `en-US`.
+
+1. Download `Siri-AI-EU-Recovery-FINAL.zip` from [Releases](https://github.com/mattisklein/siri-ai-eu-macos-recovery/releases) and extract it into Downloads.
+2. Read the script and these notes, finish any active Siri AI tasks, and run only one recovery instance at a time.
+3. Open Terminal and run:
 
 ```zsh
 chmod +x "$HOME/Downloads/Siri-AI-EU-Recovery/Siri-AI-EU-Recovery.command"
 "$HOME/Downloads/Siri-AI-EU-Recovery/Siri-AI-EU-Recovery.command"
 ```
 
-Nach `chmod` kannst du die `.command`-Datei auch im Finder doppelklicken. Liegt die Datei woanders, tippe `chmod +x ` mit Leerzeichen, ziehe sie aus dem Finder ins Terminal und drücke Enter. Beim Ausführen fragt das Skript die benötigten Administratorrechte selbst über `sudo` ab; bei der Passworteingabe werden keine Zeichen angezeigt.
+After `chmod`, you can also double-click the `.command` file in Finder. If the file is elsewhere, type `chmod +x ` with a trailing space, drag the file from Finder into Terminal, and press Enter. The script requests the administrator permissions it needs through `sudo`; no characters appear while you enter your password.
 
-**Starte die gesamte Datei als normaler angemeldeter Benutzer, ohne vorangestelltes `sudo`.** Benutzerpräferenzen und Diagnoseziele müssen zu diesem Benutzer gehören. Keine parallelen Läufe, kein Hintergrundjob und keine automatische Ausführung bei jedem Login.
+**Start the entire script as your normal signed-in user, without prefixing it with `sudo`.** User preferences and diagnostic destinations must belong to that user. Do not run parallel instances, background jobs, or an automatic recovery at every login.
 
-Für einen geklonten oder als Source-ZIP entpackten Repository-Ordner gilt dort:
+Inside a cloned repository or an extracted source ZIP, use:
 
 ```zsh
 chmod +x ./Siri-AI-EU-Recovery.command
 ./Siri-AI-EU-Recovery.command
 ```
 
-macOS kann heruntergeladene Skripte einer Sicherheitsprüfung unterziehen. Prüfe Herkunft und Inhalt und nutze gegebenenfalls die reguläre macOS-Freigabe in den Systemeinstellungen. Dieses Projekt verlangt keine Deaktivierung von Gatekeeper oder SIP.
+macOS may apply security checks to downloaded scripts. Check their origin and contents and, if necessary, use the normal macOS approval in System Settings. This project does not require disabling Gatekeeper or SIP.
 
-## Technischer Kern
+## Technical overview
 
-Der Durchbruch war die Kombination aus **frischem CFPrefs-Zustand, etwa 15 Sekunden Sprach-Propagation und anschließendem Fresh-Start von `eligibilityd`**. Allein `AppleLanguages` zu ändern erwies sich im Projekt als unzureichend.
+The breakthrough was the combination of **fresh CFPrefs state, about 15 seconds of language propagation, and a subsequent fresh start of `eligibilityd`**. Merely changing `AppleLanguages` proved insufficient in this project.
 
-Das Skript setzt Siri auf `en-US`, aktiviert Generative Assistant und setzt `AppleLanguages` temporär exakt auf `en-US, de-DE`. Nach kontrolliertem Neuladen von `cfprefsd` prüft es, soweit die Toolchain verfügbar ist, die englische Sprache über Foundation. Es sendet `AppleLanguagePreferencesChangedNotification` und `AFLanguageCodeDidChangeDarwinNotification`, wartet 15 Sekunden ohne die bestehende `eligibilityd`-Instanz selbst zu beenden und startet diese erst danach frisch. Die neue Instanz erhält beide Notifications erneut und darf fehlende Snapshots selbst erzeugen.
+The script sets Siri to `en-US`, enables Generative Assistant, and temporarily sets `AppleLanguages` to exactly `en-US, de-DE`. After a controlled reload of `cfprefsd`, it checks the English language state through Foundation when the toolchain is available. It sends `AppleLanguagePreferencesChangedNotification` and `AFLanguageCodeDidChangeDarwinNotification`, waits 15 seconds without itself terminating the existing `eligibilityd` instance, and only then starts a fresh instance. The new instance receives both notifications again and may regenerate missing snapshots itself.
 
-Der geprüfte Zielzustand ist:
+The checked target state is:
 
-| Wert | Erwartet |
+| Value | Expected |
 | --- | ---: |
 | `GREYMATTER` | 4 |
 | `AMERICIUM` | 4 |
 | `SIRI_MODE` | 4 |
-| `DEVICE_AND_SIRI_LANGUAGE_MATCH` (Ausgabe: `MATCH`) | 3 |
+| `DEVICE_AND_SIRI_LANGUAGE_MATCH` (shown as `MATCH`) | 3 |
 | `HAS_LINWOOD` | 3 |
 | `LINWOOD_AVAILABILITY` | 1 |
 
-Anschließend setzt das Skript macOS auf `de-DE, en-US, en-DE` und `com.apple.campo` auf `de-DE`; Siri bleibt `en-US`. **Nach diesem Restore sendet das Skript absichtlich keine globale Sprach-Notification mehr.** So wird keine erneute Eligibility-Berechnung mit Deutsch ausdrücklich angestoßen. Es lädt Siri-/IntelligenceFlow-Benutzerprozesse und Spotlight neu, öffnet Siri AI und prüft bis zu 120 Sekunden `SiriAvailability`.
+The script then sets macOS to `de-DE, en-US, en-DE` and `com.apple.campo` to `de-DE`; Siri remains on `en-US`. **After this restore, the script deliberately sends no further global language notification.** This avoids explicitly triggering another eligibility calculation with German. It reloads Siri/IntelligenceFlow user processes and Spotlight, opens Siri AI, and checks `SiriAvailability` for up to 120 seconds.
 
-Ist Eligibility bereits vollständig aktiv, entfällt die englische Neuberechnungsphase. Details, Wiederholungen und Fehlercodes stehen in [docs/TECHNICAL.md](docs/TECHNICAL.md).
+If eligibility is already fully active, the English recalculation phase is skipped. See [docs/TECHNICAL.md](docs/TECHNICAL.md) for details, retries, and error codes.
 
-## Neustarts und Grenzen
+## Reboots and limitations
 
-Nach einem normalen Neustart kann Eligibility zurückfallen. Führe die Recovery dann erneut aus. Es gibt keinen dauerhaften Patch und keine Garantie, dass der Zustand einen Reboot, eine spätere Neubewertung oder ein macOS-Update übersteht.
+Eligibility may revert after a normal reboot. Run the recovery again if this happens. There is no permanent patch and no guarantee that the state survives a reboot, later reevaluation, or macOS update.
 
-Lokale Eligibility und tatsächlich verfügbare Siri-/Cloud-Funktionen sind verschiedene Prüfungen. Ein lokaler Erfolg bedeutet keine Zusage für Modelle, Cloud-Antworten oder die Verfügbarkeit aller Siri-AI-Funktionen. Siri-Eingaben können bei der anschließenden Nutzung durch Apples Dienste verarbeitet werden; das Skript verändert deren Datenschutz- oder Netzwerkverhalten nicht.
+Local eligibility and actual Siri/cloud availability are separate checks. Local success does not guarantee models, cloud responses, or availability of all Siri AI features. When you subsequently use Siri, your requests may be processed by Apple's services; the script does not change their privacy or network behavior.
 
 ## Troubleshooting
 
-| Meldung / Zustand | Vorgehen |
+| Message / state | What to do |
 | --- | --- |
-| Apple Silicon, macOS 27.x oder System-App fehlen | Abbruch respektieren; keine Apple-App oder Systemdateien nachkopieren. |
-| Keine Administratorrechte | Im angemeldeten Benutzerkonto Zugriff auf `sudo` prüfen. Nicht die gesamte Recovery als root starten. |
-| Foundation-Prüfung schlägt fehl (Exit 2) | Swift-Toolchain prüfen, z. B. `xcrun --find swift`. Ein vorhandener `/usr/bin/swift`-Shim ohne funktionierende Toolchain kann scheitern. Nach dem Abbruch nur einen erneuten Lauf starten. |
-| Keine neue `eligibilityd`-PID (Exit 3/4) | Den Lauf beenden lassen und den lokalen Report prüfen. Keine zusätzlichen Systemdienste auf Verdacht beenden. |
-| Snapshots fehlen oder Zielwerte werden nicht erreicht (Exit 5) | Der Daemon erhält einen begrenzten zweiten Versuch. Danach lokal diagnostizieren; die Plists niemals manuell erzeugen oder Antworten auf 4 setzen. |
-| Eligibility fällt beim deutschen Restore zurück (Exit 6) | Lauf beendet sich ohne weitere Sprach-Notifications; dieser Zustand ist für die konkrete Konfiguration nicht bestätigt. |
-| Lokale Freischaltung erfolgreich, Siri noch nicht bereit | Mac online und wach lassen. Das Skript wartet bis zu 120 Sekunden; der Bereitschaftstest weist keine erfolgreiche Cloud-Anfrage nach. Keine PCC-/Netzwerk-Daemons neu starten. |
-| Nach Reboot wieder deaktiviert | Recovery erneut als Benutzer ausführen. |
-| Fenster schließt früh bei Fehler | Über Terminal starten und den lokalen Report lesen. Die Schlussausgabe und Fehlercodes beachten; Exit 0 allein bestätigt keinen erfolgreichen Cloud-Aufruf. |
+| Apple Silicon, macOS 27.x, or the system app is missing | Respect the abort; do not copy in an Apple app or system files. |
+| No administrator permissions | Check `sudo` access in your signed-in account. Do not start the entire recovery as root. |
+| Foundation check fails (exit 2) | Check the Swift toolchain, for example with `xcrun --find swift`. A present `/usr/bin/swift` shim without a working toolchain can fail. Start only one new run after the abort. |
+| No new `eligibilityd` PID (exit 3/4) | Let the run finish and inspect the local report. Do not terminate additional system services speculatively. |
+| Snapshots are missing or target values are not reached (exit 5) | The daemon gets one limited second attempt. Then diagnose locally; never create the plists manually or set answers to 4. |
+| Eligibility reverts during the German restore (exit 6) | The run ends without further language notifications; this state is not confirmed for the particular configuration. |
+| Local recovery succeeds, but Siri is not ready | Keep the Mac online and awake. The script waits up to 120 seconds; the readiness check does not prove a successful cloud request. Do not restart PCC/network daemons. |
+| Disabled again after reboot | Run the recovery again as your normal user. |
+| Window closes early on an error | Start through Terminal and read the local report. Check the final message and error codes; exit 0 alone does not confirm a successful cloud request. |
 
-Bei Signalen und Fehlern nach bestandenem Preflight versucht das Skript, die feste deutsche Abschlusskonfiguration herzustellen. Schreibfehler, harte Prozessabbrüche oder Stromausfall können diesen Versuch verhindern. Prüfe danach macOS- und Siri-Sprache manuell. Es gibt keine Instanzsperre; parallele Läufe können sich gegenseitig stören.
+After signals and errors following successful preflight, the script attempts to apply its fixed German final configuration. Failed writes, forced process termination, or power loss can prevent that attempt from succeeding. Check the macOS and Siri language settings manually afterwards. There is no instance lock; parallel runs can interfere with each other.
 
-## Sicherheit und Datenschutz
+## Security and privacy
 
-Die Recovery verändert Benutzerpräferenzen und startet ausgewählte lokale Prozesse neu. Sie verändert ausdrücklich nicht SIP, `/System`, WARP, Surge, DNS/VPN, `networkserviceproxy`, `privatecloudcomputed` oder Apple-Modell-/Asset-Dateien. Eligibility-Antworten werden ausschließlich gelesen; fehlende Snapshots unter `/private/var/db/eligibilityd/` und `/private/var/db/os_eligibility/` erstellt Apples `eligibilityd` selbst.
+The recovery changes user preferences and restarts selected local processes. It does not change SIP, `/System`, WARP, Surge, DNS/VPN, `networkserviceproxy`, `privatecloudcomputed`, or Apple model/asset files. Eligibility answers are only read; Apple's `eligibilityd` generates missing snapshots under `/private/var/db/eligibilityd/` and `/private/var/db/os_eligibility/` itself.
 
-Beim Ausführen entstehen lokale Dateien auf dem Desktop:
+Running the script creates local files on your Desktop:
 
 ```text
-Siri-AI-Post-Boot-<Zeitstempel>.txt
-Siri-AI-Post-Boot-<Zeitstempel>-Propagation.log
+Siri-AI-Post-Boot-<timestamp>.txt
+Siri-AI-Post-Boot-<timestamp>-Propagation.log
 ```
 
-Der Report enthält Diagnoseausgaben, im Fehlerfall auch gefilterte Systemlogs. Das Propagation-Log erfasst Debug-Ausgaben der beteiligten Dienste. **Diese Dateien können private Account-, Geräte-, Pfad- oder Laufzeitinformationen enthalten. Niemals ungeprüft in Issues, Kommentare oder öffentliche Repositories hochladen.** Die anfängliche `umask 077` beschränkt neue Dateien, ersetzt aber keine Inhaltsprüfung. Die Recovery lädt diese Dateien nicht hoch. Bei Fehlern kann der begrenzte Log-Stream bis zu seinem Timeout weiterlaufen; die Dateien verbleiben zur lokalen Diagnose.
+The report contains diagnostic output and, on failure, filtered system logs. The propagation log captures debug output from the involved services. **These files may contain private account, device, path, or runtime information. Never upload them to issues, comments, or public repositories without reviewing and sanitizing them.** The initial `umask 077` restricts newly created files but does not replace a content review. The recovery does not upload these files. On errors, the bounded log stream may continue until its timeout; files remain available for local diagnosis.
 
-Für Fehlermeldungen reichen normalerweise die Betriebssystemversion, der Build, der betroffene Schritt und die anonymisierten sechs Zielwerte. Entferne Namen, Benutzernamen, persönliche Pfade, Seriennummern, Apple-ID-/E-Mail-Daten, IPs, Tokens, Cookies und Authentifizierungsdaten. Keine Screenshots, kompletten Systemreports oder Plist-Dumps veröffentlichen.
+For error reports, the operating system version, build, affected step, and six anonymized target values usually suffice. Remove names, local usernames, personal paths, serial numbers, Apple ID/email data, IP addresses, tokens, cookies, and authentication data. Do not publish screenshots, complete system reports, or plist dumps.
 
-Die `.gitignore` verwendet eine ausdrückliche Dateiliste. Neue Dateien müssen bewusst freigegeben und vor dem Commit geprüft werden. [docs/VALIDATION.md](docs/VALIDATION.md) beschreibt den Umfang der Veröffentlichung und ihrer Prüfungen.
+The `.gitignore` uses an explicit file allowlist. New files must be deliberately allowed and reviewed before committing. [docs/VALIDATION.md](docs/VALIDATION.md) describes the publication scope and checks.
 
-## Lizenz und Disclaimer
+## License and disclaimer
 
-Skript und Dokumentation stehen unter der [MIT-Lizenz](LICENSE). Apple-Software, Systemdateien, Binaries, Modelle und andere Apple-Assets sind nicht Bestandteil dieses Repositories und werden nicht mitlizenziert.
+The script and documentation are available under the [MIT license](LICENSE). Apple software, system files, binaries, models, and other Apple assets are not part of this repository and are not covered by its license.
 
-Nutzung auf eigene Verantwortung und ohne Gewährleistung. Das Projekt ist inoffiziell und stammt nicht von Apple. Die dokumentierten internen Namen und Zahlen beschreiben den beobachteten Projektstand; es handelt sich nicht um eine zugesicherte öffentliche Apple-API. Zukünftige macOS-Versionen können einen anderen internen Ablauf verwenden.
+Use at your own risk, without warranty. This is an unofficial project and does not come from Apple. The documented internal names and numbers describe the observed project state, not a guaranteed public Apple API. Future macOS versions may use a different internal procedure.

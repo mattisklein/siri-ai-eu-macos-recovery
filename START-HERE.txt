@@ -1,0 +1,59 @@
+Siri AI EU Recovery - English quick-start guide
+==============================================
+
+Documentation / Anleitung:
+English: https://github.com/mattisklein/siri-ai-eu-macos-recovery/blob/main/README.md
+Deutsch: https://github.com/mattisklein/siri-ai-eu-macos-recovery/blob/main/README.de.md
+
+1. Extract Siri-AI-EU-Recovery-FINAL.zip into your Downloads folder.
+
+2. Open Terminal and run:
+
+chmod +x "$HOME/Downloads/Siri-AI-EU-Recovery/Siri-AI-EU-Recovery.command"
+"$HOME/Downloads/Siri-AI-EU-Recovery/Siri-AI-EU-Recovery.command"
+
+After chmod, you can also double-click the .command file in Finder.
+If you moved it elsewhere, type chmod +x followed by a space, drag the
+file from Finder into Terminal, and press Enter.
+
+3. Run as your normal signed-in user. Do not prefix the entire script
+   with sudo. The script asks for administrator permissions itself.
+   No characters appear while you enter your administrator password.
+
+4. Run only one recovery instance at a time. Read the final message and
+   the local status values; a normal exit does not prove a cloud request
+   succeeded.
+
+Requirements and fixed language configuration
+---------------------------------------------
+- Apple Silicon Mac, running natively as arm64.
+- macOS 27.x and an existing /System/Applications/Siri AI.app.
+- Verified in the local project on macOS 27.0.1, build 26A434.
+- Other 27.x builds are accepted by preflight but are not verified.
+- macOS and the Siri AI interface end up configured in German.
+- Siri remains on en-US. The console messages remain in German.
+- This English guide does not select an English final system language.
+- The script does not save and restore an arbitrary previous language
+  configuration. Record your previous settings if you need them later.
+
+Security and private diagnostics
+--------------------------------
+The recovery does not change SIP, /System, WARP, Surge, DNS/VPN,
+networkserviceproxy, privatecloudcomputed, or Apple models/assets.
+It never edits eligibility answers manually to 4.
+
+The script creates a report and a propagation debug log on the Desktop.
+These may contain private account, device, path, or runtime information.
+Never publish these raw files or upload them to public issues without
+reviewing and sanitizing their contents.
+
+Reboots and limitations
+-----------------------
+Eligibility may revert after a normal reboot; run the recovery again.
+If local recovery succeeds but Siri AI is not ready, keep the Mac online
+and awake. Do not restart PCC or network daemons speculatively.
+
+This project is unofficial and unaffiliated with Apple. There is no
+guarantee for future macOS versions or cloud availability.
+See the English or German README for complete instructions,
+troubleshooting, privacy notes, and the MIT license.

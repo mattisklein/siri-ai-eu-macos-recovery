@@ -3,9 +3,13 @@
 *
 !/.gitignore
 !/README.md
+!/README.de.md
 !/LICENSE
 !/START-HIER.txt
+!/START-HERE.txt
 !/Siri-AI-EU-Recovery.command
 !/docs/
 !/docs/TECHNICAL.md
+!/docs/TECHNICAL.de.md
 !/docs/VALIDATION.md
+!/docs/VALIDATION.de.md

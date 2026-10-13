@@ -1,56 +1,64 @@
-# Veröffentlichungsumfang und Prüfungen
+# Publication scope and validation
 
-Der öffentliche Stand wurde aus einer ausdrücklichen Dateiliste in einem neuen, separaten Staging-Verzeichnis aufgebaut. Die Forschungsordner und deren Git-History wurden nicht übernommen. Es wurde keine bestehende Forschungsdateiliste pauschal mit `git add .` importiert.
+**Language:** English | [Deutsch](VALIDATION.de.md)
 
-## Veröffentlichte Dateien
+Return to the [project overview](../README.md).
+
+The public version was assembled from an explicit file list in a new, separate staging directory. The research directories and their Git history were excluded. No existing research file list was imported wholesale with `git add .`.
+
+## Published files
 
 - `README.md`
+- `README.de.md`
 - `LICENSE`
 - `.gitignore`
+- `START-HERE.txt`
 - `START-HIER.txt`
 - `Siri-AI-EU-Recovery.command`
 - `docs/TECHNICAL.md`
+- `docs/TECHNICAL.de.md`
 - `docs/VALIDATION.md`
+- `docs/VALIDATION.de.md`
 
-Die Release-Datei `Siri-AI-EU-Recovery-FINAL.zip` wird separat ausgeliefert. Sie enthält ausschließlich den Ordner `Siri-AI-EU-Recovery/` mit `Siri-AI-EU-Recovery.command` und `START-HIER.txt`. Beide Dateien stimmen bytegenau mit den Dateien des Repositories überein. `SHA256SUMS` im Release ermöglicht eine Integritätsprüfung:
+The release asset `Siri-AI-EU-Recovery-FINAL.zip` is distributed separately. The original v1.0.0 ZIP remains unchanged and contains only the `Siri-AI-EU-Recovery/` directory with `Siri-AI-EU-Recovery.command` and the German `START-HIER.txt`. Both files match their repository counterparts byte for byte. The English `START-HERE.txt` is available in the repository; it is not added to the original ZIP. The release's `SHA256SUMS` enables an integrity check:
 
 ```zsh
-# Im Ordner mit beiden heruntergeladenen Release-Dateien:
+# In the directory containing both downloaded release assets:
 shasum -a 256 -c SHA256SUMS
 ```
 
-SHA-256 der unveränderten Recovery-Datei:
+SHA-256 of the unchanged recovery file:
 
 ```text
 6157720a53aae10fec8e4477f1ddb860fae8eb9d0eb4af4c37c425dfae2d4a8f
 ```
 
-SHA-256 der unveränderten finalen ZIP:
+SHA-256 of the unchanged final ZIP:
 
 ```text
 8e8542c3e5d6665ca1c6c5eb375730dfde9d43c69f5a32f1ea8551a9895cee01
 ```
 
-## Syntax und Plausibilität
+## Syntax and plausibility
 
-- `/bin/zsh -n Siri-AI-EU-Recovery.command` prüft die vollständige Shell-Syntax, ohne die Recovery auszuführen.
-- Vollständige statische Durchsicht prüft Preflight, Privilegien, feste Preference-Ziele, lesende Eligibility-Zugriffe, Reihenfolge der Notifications, 15-Sekunden-Propagation, neue Daemon-PID und Abschlusskonfiguration.
-- Eine lokale Prüfung bestätigt die relevanten Codeabschnitte und deren Reihenfolge sowie das Fehlen eines expliziten globalen Notification-Aufrufs nach dem Restore.
-- Der eingebettete Swift/Foundation-Ausdruck wird separat typgeprüft, ohne die Recovery oder Preference-Änderungen auszuführen.
-- Original, öffentliche Skriptkopie und ZIP-Inhalt werden bytegenau verglichen; ZIP-CRC und Member-Liste werden geprüft.
+- `/bin/zsh -n Siri-AI-EU-Recovery.command` checks the complete shell syntax without executing the recovery.
+- A complete static review checks the preflight, privileges, fixed preference targets, read-only eligibility access, notification sequence, 15-second propagation phase, new daemon PID and final configuration.
+- A local check confirms the relevant code sections and their order, as well as the absence of an explicit global notification call after the restore.
+- The embedded Swift/Foundation expression is type-checked separately without executing the recovery or changing preferences.
+- The original, public script copy and ZIP contents are compared byte for byte; the ZIP CRC and member list are checked.
 
-ShellCheck wurde nicht eingesetzt; das Skript verwendet zsh. Die Veröffentlichung führte die Recovery nicht erneut aus und änderte keine Systemeinstellungen. Der Funktionsnachweis auf macOS 27.0.1 / Build 26A434 stammt aus dem lokalen Projekt. Syntax- und Plausibilitätsprüfungen ersetzen keinen Test auf anderen Builds oder Macs.
+ShellCheck was not used; the script uses zsh. Preparing the publication did not execute the recovery again or change system settings. The functional result on macOS 27.0.1 / build 26A434 comes from the local project. Syntax and plausibility checks do not replace testing on other builds or Macs.
 
-## Privacy- und Secret-Prüfung
+## Privacy and secret checks
 
-Alle geplanten öffentlichen Textdateien, die entpackten Release-Inhalte und die vollständige neue Git-History werden vor der Veröffentlichung kontrolliert. Die Prüfung kombiniert Gitleaks mit einer zusätzlichen Suche nach persönlichen Pfaden, lokaler Benutzer-/Git-Identität, E-Mail-Adressen, IP-Adressen, Geräte-/Accountkennungen, privaten Schlüsseln, Tokenmustern und Authentifizierungsdaten. Eine unabhängige manuelle Durchsicht ergänzt die automatischen Prüfungen.
+All planned public text files, unpacked release contents and the complete public Git history are checked before publication. The checks combine Gitleaks with an additional search for personal paths, local user/Git identities, email addresses, IP addresses, device/account identifiers, private keys, token patterns and authentication data. An independent manual review supplements the automated checks.
 
-Die ZIP-Prüfung umfasst auch Kommentare, Zusatzfelder, Ressource-Forks, unerwartete Mitglieder und nachgestellte Daten. Git-Dateiinhalte und ZIP-Mitglieder enthalten keine übernommenen erweiterten Dateiattribute. Lokale Quarantäne-Attribute wurden aus dem Staging entfernt; macOS kann dort weiterhin ein lokales Provenance-Attribut führen, das weder Git noch diese ZIP überträgt. Git-Blobs werden gegen die freigegebene Dateiliste geprüft; der öffentliche Stand beginnt mit einem neuen Root-Commit. Der Git-Autor verwendet ausschließlich den authentifizierten GitHub-Login und dessen ID-basierte GitHub-Noreply-Adresse. Globale private Git-Identitätswerte werden nicht übernommen.
+The ZIP review also covers comments, extra fields, resource forks, unexpected members and trailing data. Git file contents and ZIP members contain no copied extended file attributes. Local quarantine attributes were removed from staging; macOS may retain a local provenance attribute there, which neither Git nor this ZIP transmits. Git blobs are checked against the approved file list. The initial publication started with a fresh root commit; later documentation commits pass the same privacy checks. The old research history remains excluded. Commit authors use only the authenticated GitHub login and its ID-based GitHub noreply address. Private global Git identity values are not copied.
 
-Vor dem Push werden `git status`, der vollständige staged Diff, die Repository-Dateiliste, Secret-/Privacy-Ergebnisse und sämtliche erreichbaren Git-Objekte kontrolliert. Die Release-Notizen und Prüfsummendatei gehören ebenfalls zum geprüften Veröffentlichungsumfang. Automatische Musterprüfungen liefern keine universelle Garantie; die begrenzte Dateiliste und manuelle Kontrolle sind deshalb Teil des Verfahrens.
+Before a push, `git status`, the complete staged diff, the repository file list, secret/privacy results and all reachable Git objects are reviewed. Release notes and the checksum file are also included in the reviewed publication scope. Automated pattern checks provide no universal guarantee; the limited file list and manual review are therefore part of the procedure.
 
-## Bewusst ausgeschlossen
+## Deliberately excluded
 
-Ausgeschlossen bleiben ältere und alternative Recovery-/Diagnoseskripte, Rohlogs, Terminal-Historien, vollständige Systemreports, Screenshots, Plist-Dumps, Account-/Geräteinformationen, persönliche Metadaten und die bestehende Forschungs-History. Ebenso ausgeschlossen sind Apple-Systemdateien, Apple-Binaries, Modelle und Assets. Lokale Audit-Artefakte und Laufzeitdiagnosen werden nicht veröffentlicht.
+Older and alternative recovery/diagnostic scripts, raw logs, terminal histories, complete system reports, screenshots, plist dumps, account/device information, personal metadata and the existing research history remain excluded. Apple system files, Apple binaries, models and assets are also excluded. Local audit artifacts and runtime diagnostics are not published.
 
-Die Recovery erzeugt bei späterer Nutzung eigene Desktop-Reports und Propagation-Logs. Diese können private Informationen enthalten und gehören auch nach einem erfolgreichen Lauf niemals ungeprüft in dieses Repository oder in öffentliche Issues.
+When used later, the recovery generates its own Desktop reports and propagation logs. These may contain private information and must never be added to this repository or public issues without review, even after a successful run.

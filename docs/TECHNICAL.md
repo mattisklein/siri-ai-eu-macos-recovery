@@ -1,46 +1,52 @@
-# Technischer Ablauf der Recovery
+# Technical recovery flow
 
-Diese Dokumentation beschreibt `Siri-AI-EU-Recovery.command`. Die Angaben zur erfolgreichen Aktivierung stammen aus dem lokalen Projekt: verifiziert wurde ein Apple-Silicon-Mac mit **macOS 27.0.1, Build 26A434** und vorhandener `/System/Applications/Siri AI.app`. Das ist ein berichteter Testzustand, keine unabhängige Bestätigung für sämtliche Macs, Regionen oder Sprachkombinationen.
+**Language:** English | [Deutsch](TECHNICAL.de.md)
 
-Das Skript akzeptiert im Preflight macOS `27.x`. Diese Versionsprüfung erweitert den Kreis möglicher Versuche; sie belegt keine Kompatibilität weiterer Versionen oder Builds. Auf anderen Builds erscheint ein Hinweis und das Skript fährt fort. Apples interne Preference-Schlüssel, Notifications, Daemons und Statuswerte sind keine stabile öffentliche Schnittstelle.
+[Back to the README](../README.md)
 
-## Was den erfolgreichen Ablauf auszeichnet
+Switching the documentation language changes only the guide. The recovery's fixed final configuration remains German for macOS and Siri AI / Campo, with `en-US` for Siri.
 
-Im dokumentierten Versuch reichte es nicht, `AppleLanguages` allein zu ändern. Die erfolgreiche Reihenfolge kombinierte drei Schritte:
+This document describes `Siri-AI-EU-Recovery.command`. The successful activation results come from the local project: verification was performed on an Apple Silicon Mac running **macOS 27.0.1, build 26A434**, with `/System/Applications/Siri AI.app` present. This is a reported test configuration, rather than independent confirmation for every Mac, region or language combination.
 
-1. Die temporäre englische Sprachkonfiguration wurde mit neu geladenen `cfprefsd`-Prozessen für Preference-Leser sichtbar gemacht.
-2. Nach den Sprach-Notifications blieb die bestehende `eligibilityd`-Instanz ungefähr **15 Sekunden** am Leben.
-3. Erst anschließend wurde `eligibilityd` beendet und eine Instanz mit neuer PID abgewartet; diese erhielt die Notifications erneut.
+The script accepts macOS `27.x` during preflight. This version check allows attempts on a wider range of versions; it does not establish compatibility with other versions or builds. On other builds, the script displays a notice and continues. Apple's internal preference keys, notifications, daemons and status values are not a stable public interface.
 
-Die Propagationsphase soll `assistantd`, `generativeexperiencesd` und CFPrefs Gelegenheit geben, die Sprachänderung zu verarbeiten. Das ist die aus den Beobachtungen abgeleitete Erklärung für die gewählte Reihenfolge. Das Projekt beweist damit weder eine bestimmte interne Apple-Implementierung noch, dass exakt 15 Sekunden unter allen Bedingungen ausreichen oder erforderlich sind. Eine neue PID bestätigt einen Prozesswechsel, aber nicht allein den Inhalt aller internen Caches.
+## What made the documented flow successful
 
-## 1. Preflight und Berechtigungen
+In the documented test, changing `AppleLanguages` alone was insufficient. The successful sequence combined three steps:
 
-Das Skript prüft:
+1. Reloaded `cfprefsd` processes made the temporary English language configuration visible to preference readers.
+2. After the language notifications, the existing `eligibilityd` instance remained alive for approximately **15 seconds**.
+3. Only then was `eligibilityd` terminated and an instance with a new PID awaited; this instance received the notifications again.
 
-- `uname -m` muss `arm64` melden. Auch ein Apple-Silicon-Mac muss das Skript daher in einer nativen Umgebung ausführen.
-- `sw_vers -productVersion` muss mit `27.` beginnen.
-- `/System/Applications/Siri AI.app` muss als Verzeichnis vorhanden sein. Das Skript erzeugt oder installiert diese App nicht.
-- `sudo -v` muss erfolgreich sein. Administratorrechte werden zum Lesen der geschützten Eligibility-Plists und zum kontrollierten Beenden von Systemprozessen benötigt.
+The propagation phase is intended to give `assistantd`, `generativeexperiencesd` and CFPrefs time to process the language change. This explanation for the chosen order is inferred from the observations. The project does not prove a specific internal Apple implementation, or that exactly 15 seconds is sufficient or necessary under all conditions. A new PID confirms a process change, but does not by itself establish the contents of every internal cache.
 
-Erst nach diesen Prüfungen wird der Abschluss-Handler zum Setzen der deutschen Konfiguration freigegeben. Bei einem frühen Preflight-Abbruch schreibt das Skript keine Spracheinstellungen. Lokale Report- und temporäre Dateien werden allerdings bereits vor dem Preflight angelegt.
+## 1. Preflight and permissions
 
-Die `.command`-Datei soll als angemeldeter Benutzer gestartet werden, **nicht als vollständiges Skript mit `sudo`**. Die einzelnen privilegierten Aufrufe erfolgen innerhalb des Skripts. So beziehen sich die normalen `defaults`-Aufrufe auf den vorgesehenen Benutzer.
+The script checks:
 
-## 2. Zustand lesen und bereits aktive Geräte behandeln
+- `uname -m` must report `arm64`. An Apple Silicon Mac therefore also needs to run the script in a native environment.
+- `sw_vers -productVersion` must start with `27.`.
+- `/System/Applications/Siri AI.app` must exist as a directory. The script does not create or install this app.
+- `sudo -v` must succeed. Administrator privileges are needed to read the protected eligibility plists and terminate system processes in a controlled manner.
 
-Die Recovery liest ausgewählte Schlüssel aus zwei vorhandenen Snapshots:
+Only after these checks is the finalization handler allowed to set the German configuration. If preflight stops early, the script does not write language preferences. However, local report and temporary files are created before preflight.
+
+Run the `.command` file as the signed-in user, **not by running the entire script with `sudo`**. Individual privileged calls take place inside the script. This ensures that the ordinary `defaults` calls apply to the intended user.
+
+## 2. Read the state and handle devices that are already eligible
+
+The recovery reads selected keys from two existing snapshots:
 
 ```text
 /private/var/db/eligibilityd/eligibility.plist
 /private/var/db/os_eligibility/eligibility.plist
 ```
 
-`PlistBuddy` wird dabei ausschließlich mit `Print` verwendet. Es gibt keine Befehle, die Eligibility-Antworten direkt verändern. Ein fehlender Snapshot wird als fehlender Zustand behandelt; die Recovery legt keinen Ersatz mit vorgegebenen Antworten an.
+`PlistBuddy` is used exclusively with `Print`. There are no commands that directly modify eligibility answers. A missing snapshot is treated as a missing state; the recovery does not create a replacement containing predetermined answers.
 
-Für den lokalen Erfolg müssen alle sechs Prüfungen gleichzeitig passen:
+All six checks must match at the same time for local success:
 
-| Ausgabebezeichnung | Snapshot / Domain / Schlüssel | Ziel |
+| Output label | Snapshot / domain / key | Target |
 | --- | --- | ---: |
 | `GREYMATTER` | `eligibilityd`, `OS_ELIGIBILITY_DOMAIN_GREYMATTER`, `os_eligibility_answer_t` | `4` |
 | `AMERICIUM` | `eligibilityd`, `OS_ELIGIBILITY_DOMAIN_AMERICIUM`, `os_eligibility_answer_t` | `4` |
@@ -49,13 +55,13 @@ Für den lokalen Erfolg müssen alle sechs Prüfungen gleichzeitig passen:
 | `HAS_LINWOOD` | `eligibilityd`, AMERICIUM, `status:OS_ELIGIBILITY_INPUT_HAS_LINWOOD` | `3` |
 | `LINWOOD_AVAILABILITY` | `eligibilityd`, AMERICIUM, `context:OS_ELIGIBILITY_CONTEXT_LINWOOD_AVAILABILITY` | `1` |
 
-Die beiden zusätzlich ausgegebenen `DEVICE_LANGUAGE`-Werte sind diagnostisch; `eligible_now()` verwendet sie nicht als Erfolgskriterium. Die Zahlen werden hier als beobachtete Zielwerte beschrieben. Ihre Namen allein erlauben keine verlässliche vollständige Interpretation der internen Apple-Enums.
+The two additional `DEVICE_LANGUAGE` values shown in the output are diagnostic; `eligible_now()` does not use them as success criteria. These numbers are described here as observed target values. Their names alone do not provide a reliable, complete interpretation of Apple's internal enums.
 
-Wenn bereits alle sechs Zielwerte vorliegen, überspringt das Skript die temporäre englische Phase, den CFPrefs-Neustart und die Eligibility-Neuberechnung. Es setzt trotzdem die unten beschriebene feste Abschlusskonfiguration, prüft den Zustand erneut und lädt die Siri-Benutzerprozesse neu.
+If all six target values are already present, the script skips the temporary English phase, the CFPrefs restart and the eligibility recalculation. It still applies the fixed final configuration described below, checks the state again and reloads the Siri user processes.
 
-## 3. Temporäre Sprachkonfiguration setzen
+## 3. Set the temporary language configuration
 
-Wenn eine Neuberechnung nötig ist, wird Siri AI zunächst geschlossen. Danach setzt das Skript:
+If recalculation is needed, Siri AI is closed first. The script then sets:
 
 ```text
 com.apple.assistant.backedup / Session Language = en-US
@@ -63,52 +69,52 @@ com.apple.siri.generativeassistantsettings / isEnabled = true
 NSGlobalDomain / AppleLanguages = [en-US, de-DE]
 ```
 
-Die globale Liste enthält in dieser Phase **exakt** `en-US`, anschließend `de-DE`. Siri bleibt englisch. Die Reihenfolge ist Teil des reproduzierten Ablaufs. Die Recovery bietet keine allgemeine Auswahl für beliebige Sprachlisten oder andere Siri-Sprachen.
+During this phase, the global list contains **exactly** `en-US`, followed by `de-DE`. Siri remains in English. This ordering is part of the reproduced flow. The recovery does not offer a general choice of arbitrary language lists or other Siri languages.
 
-## 4. CFPrefs neu laden und Foundation prüfen
+## 4. Reload CFPrefs and check Foundation
 
-`refresh_preference_daemons()` beendet zunächst erreichbare `cfprefsd`-Prozesse mit `killall`, dann zusätzlich mit `sudo killall`. Anschließend wartet es **3 Sekunden** und zeigt die wieder vorhandenen Prozesse an. Die Recovery verändert keine Preference-Dateien des Systems direkt und schreibt keinen Cache von Hand.
+`refresh_preference_daemons()` first terminates reachable `cfprefsd` processes with `killall`, then additionally with `sudo killall`. It waits **3 seconds** and displays the processes that are present again. The recovery does not directly modify system preference files or write a cache by hand.
 
-Wenn `/usr/bin/swift` ausführbar vorhanden ist, startet das Skript einen kurzen Foundation-Test. Dieser gibt `Locale.preferredLanguages` und die bevorzugte Lokalisierung für die Kandidaten `en`, `de`, `fr`, `es`, `it` aus. Als bestanden gilt die Ausgabe, wenn entweder die Sprachliste mit `en-US` beginnt oder die bevorzugte Lokalisierung mit `en` beginnt.
+If `/usr/bin/swift` is present and executable, the script runs a short Foundation test. It prints `Locale.preferredLanguages` and the preferred localization for the candidates `en`, `de`, `fr`, `es`, `it`. The output passes the check if either the language list starts with `en-US` or the preferred localization starts with `en`.
 
-Bei einem fehlgeschlagenen Test wird CFPrefs erneut geladen. Es gibt höchstens **drei Foundation-Versuche**. Sind sie erfolglos, endet der Aktivierungsdurchlauf mit Exit-Code `2`; der Abschluss-Handler versucht dann die deutsche Konfiguration zu setzen.
+If the test fails, CFPrefs is reloaded again. There are at most **three Foundation attempts**. If they fail, the activation flow stops with exit code `2`; the finalization handler then attempts to set the German configuration.
 
-Fehlt eine ausführbare `/usr/bin/swift`, überspringt das Skript diese zusätzliche Prüfung. Eine erfolgreiche Recovery ohne diesen Test enthält deshalb keine direkte Foundation-Verifikation. Ein vorhandener Swift-Starter ohne funktionierende Toolchain kann dagegen fehlschlagen und zum Abbruch führen. Die Prüfung ist kein umfassender Nachweis für den Sprachzustand aller bereits laufenden Prozesse.
+If there is no executable `/usr/bin/swift`, the script skips this additional check. A successful recovery without this test therefore includes no direct Foundation verification. Conversely, an existing Swift launcher without a working toolchain can fail and cause the script to stop. The check does not comprehensively establish the language state of all processes that are already running.
 
-## 5. Notifications und 15 Sekunden Propagation
+## 5. Notifications and 15 seconds of propagation
 
-Das Skript startet einen lokalen Unified-Log-Stream für `eligibilityd`, `assistantd`, `generativeexperiencesd` und `cfprefsd` mit einer Laufzeit von bis zu 60 Sekunden. Danach sendet es über `notifyutil -p`:
+The script starts a local unified log stream for `eligibilityd`, `assistantd`, `generativeexperiencesd` and `cfprefsd`, running for up to 60 seconds. It then posts the following with `notifyutil -p`:
 
 ```text
 AppleLanguagePreferencesChangedNotification
 AFLanguageCodeDidChangeDarwinNotification
 ```
 
-Es wartet anschließend **15 Sekunden**, ohne selbst die bestehende `eligibilityd`-Instanz zu beenden. Dieser Abstand zwischen Preference-Änderung und Prozesswechsel ist ein wesentlicher Teil des dokumentierten erfolgreichen Ablaufs. Die Recovery kann nicht verhindern, dass das Betriebssystem einen Prozess in dieser Zeit aus anderen Gründen beendet.
+It waits **15 seconds** without itself terminating the existing `eligibilityd` instance. This gap between the preference change and the process change is an essential part of the documented successful flow. The recovery cannot prevent the operating system from terminating a process during that time for other reasons.
 
-## 6. Eligibility mit einer frischen Instanz berechnen lassen
+## 6. Let a fresh instance calculate eligibility
 
-`restart_eligibilityd()` ermittelt die erste von `pgrep -x eligibilityd` gemeldete PID und sendet ihr, sofern vorhanden, mit `sudo kill -TERM` ein Terminationssignal. Danach sucht es in Schritten von 0,25 Sekunden bis zu ungefähr **15 Sekunden** nach einer neuen, unterschiedlichen PID.
+`restart_eligibilityd()` finds the first PID reported by `pgrep -x eligibilityd` and, if one exists, sends it a termination signal using `sudo kill -TERM`. It then looks for a new, different PID in 0.25-second intervals for up to approximately **15 seconds**.
 
-Fehlt eine neue PID weiterhin, sendet das Skript `AppleLanguagePreferencesChangedNotification` als im Projekt verwendetes LaunchEvent und sucht nochmals bis zu ungefähr 15 Sekunden. Es installiert keinen LaunchDaemon und ersetzt keine Apple-Binärdatei. Kommt keine neue PID zustande, bricht der erste Versuch mit Exit-Code `3` ab.
+If a new PID is still missing, the script posts `AppleLanguagePreferencesChangedNotification` as the LaunchEvent used in the project and searches again for up to approximately 15 seconds. It does not install a LaunchDaemon or replace an Apple binary. If no new PID appears, the first attempt stops with exit code `3`.
 
-Nach erfolgreichem Prozesswechsel folgt diese Reihenfolge:
+After a successful process change, the sequence is:
 
-1. **2 Sekunden** warten.
-2. Beide Sprach-Notifications erneut senden.
-3. **8 Sekunden** Initialisierung abwarten.
-4. Bis zu ungefähr **10 Sekunden** prüfen, ob beide Snapshot-Dateien vorhanden sind: maximal 20 Prüfungen mit jeweils 0,5 Sekunden Abstand.
-5. Die ausgewählten Statuswerte lesen und alle sechs Zielwerte vergleichen.
+1. Wait **2 seconds**.
+2. Post both language notifications again.
+3. Wait **8 seconds** for initialization.
+4. Check for both snapshot files for up to approximately **10 seconds**: at most 20 checks, each separated by 0.5 seconds.
+5. Read the selected status values and compare all six target values.
 
-Das Warten prüft die Existenz der Dateien, nicht einen Zeitstempel oder eine garantierte Neuschreibung aller Inhalte. Fehlende Snapshots darf **Apples `eligibilityd` selbst regenerieren**. Das Skript löscht keine Snapshots und schreibt weder Antworten auf `4` noch Statuswerte auf andere Zielzahlen.
+The wait checks whether the files exist; it does not check a timestamp or guarantee that all contents were rewritten. **Apple's `eligibilityd` is allowed to regenerate missing snapshots itself**. The script does not delete snapshots, set answers to `4` or write other target numbers into status fields.
 
-Sind die sechs Zielwerte nach dem ersten Versuch nicht vollständig erreicht, folgt **genau ein zweiter kontrollierter Prozesswechsel** mit derselben Reihenfolge `2 Sekunden → Notifications → 8 Sekunden → Snapshot-Warten`. Eine erneute 15-Sekunden-Propagationsphase gibt es beim zweiten Versuch nicht.
+If the six target values are not all reached after the first attempt, the script performs **exactly one additional controlled process change**, with the same sequence: `2 seconds → notifications → 8 seconds → snapshot wait`. The second attempt does not repeat the 15-second propagation phase.
 
-Scheitert der zweite Prozesswechsel, folgt Exit-Code `4`. Bleibt der Zielzustand nach beiden Versuchen unvollständig, folgt Exit-Code `5`. In diesem Fall schreibt die Recovery zusätzlich ausgewählte lokale Diagnosen in ihren Report. Auch hier werden keine Eligibility-Antworten manuell ersetzt.
+If the second process change fails, the script exits with code `4`. If the target state remains incomplete after both attempts, it exits with code `5`. In that case, the recovery also writes selected local diagnostics to its report. Here too, no eligibility answers are manually replaced.
 
-## 7. Feste deutsche Abschlusskonfiguration
+## 7. Fixed German final configuration
 
-Nach erfolgreicher lokaler Eligibility-Prüfung setzt `finalize_german()`:
+After a successful local eligibility check, `finalize_german()` sets:
 
 ```text
 NSGlobalDomain / AppleLanguages = [de-DE, en-US, en-DE]
@@ -117,19 +123,19 @@ com.apple.siri.generativeassistantsettings / isEnabled = true
 com.apple.campo / AppleLanguages = [de-DE]
 ```
 
-Damit wird Deutsch als primäre globale Sprache konfiguriert, Siri bleibt `en-US`, und Siri AI / Campo erhält eine deutsche App-Lokalisierung. Die tatsächliche Darstellung bereits laufender anderer Apps kann einen späteren App-Neustart benötigen.
+This configures German as the primary global language, keeps Siri at `en-US`, and assigns German app localization to Siri AI / Campo. Other apps that are already running may need a later app restart before their displayed language changes.
 
-Der Begriff „Restore“ bezeichnet hier **diese feste Zielkonfiguration**. Das Skript sichert keine beliebige vorherige Sprachliste und stellt sie nicht automatisch wieder her. Auch der bereits aktive Fast Path setzt diesen Endzustand. Für ein anderes gewünschtes Sprachprofil ist das veröffentlichte Skript daher nicht unverändert geeignet.
+Here, “restore” means **this fixed target configuration**. The script does not back up an arbitrary previous language list and automatically restore it. The path for devices that are already eligible also sets this final state. The published script is therefore unsuitable, without changes, for a different desired language profile.
 
-Nach diesen Preference-Schreibvorgängen sendet das Skript **absichtlich keine weitere explizite globale Sprach-Notification**. Im dokumentierten Versuch blieb so der zuvor unter Englisch berechnete Eligibility-Zustand erhalten. Daraus folgt keine Garantie, dass Apple oder andere Prozesse keine spätere Neuberechnung auslösen können.
+After these preference writes, the script **deliberately posts no further explicit global language notification**. In the documented test, this preserved the eligibility state previously calculated under English. This does not guarantee that Apple or other processes cannot trigger a later recalculation.
 
-Unmittelbar nach dem Setzen der deutschen Konfiguration werden die sechs Eligibility-Werte erneut geprüft. Sind sie zurückgefallen, folgt Exit-Code `6`; das Skript sendet keine zusätzlichen Sprach-Notifications und öffnet Siri AI auf diesem Abbruchpfad nicht.
+The six eligibility values are checked again immediately after setting the German configuration. If they have fallen back, the script exits with code `6`; it does not post additional language notifications or open Siri AI on this exit path.
 
-Der Abschluss-Handler versucht diese deutsche Konfiguration auch bei Fehlern nach bestandenem Preflight sowie bei `INT`, `TERM` und `HUP`. Das ist eine Best-Effort-Wiederherstellung. Fehlgeschlagene `defaults`-Schreibvorgänge, ein erzwungenes `SIGKILL`, Stromverlust oder andere Unterbrechungen können sie verhindern. Das Skript prüft nicht jeden einzelnen Schreibvorgang auf Erfolg und läuft mit `set +e`; es gibt keine absolute Wiederherstellungsgarantie.
+The finalization handler also attempts to apply the German configuration after errors following a successful preflight, and on `INT`, `TERM` and `HUP`. This is a best-effort restoration. Failed `defaults` writes, a forced `SIGKILL`, power loss or other interruptions can prevent it. The script does not check every individual write for success and runs with `set +e`; there is no absolute restoration guarantee.
 
-## 8. Siri-Benutzerprozesse neu laden und Verfügbarkeit abwarten
+## 8. Reload Siri user processes and wait for availability
 
-Nach der deutschen Konfiguration und der erneuten Eligibility-Prüfung schließt das Skript Siri AI nochmals und beendet die erreichbaren Benutzerprozesse:
+After applying the German configuration and checking eligibility again, the script closes Siri AI once more and terminates the reachable user processes:
 
 ```text
 intelligenceflowd
@@ -139,46 +145,46 @@ assistantd
 Spotlight
 ```
 
-Spotlight wird ebenfalls neu geladen, damit seine Oberfläche die deutsche Lokalisierung frisch übernehmen kann. Nach **4 Sekunden** wird die vorhandene Siri-AI-App geöffnet. Diese Prozessneustarts können laufende Siri-Interaktionen unterbrechen.
+Spotlight is also reloaded so that its interface can pick up the German localization afresh. After **4 seconds**, the existing Siri AI app is opened. These process restarts can interrupt ongoing Siri interactions.
 
-Danach prüft das Skript bis zu **120 Sekunden**, ob `com.apple.assistant.backedup / SiriAvailability` die Textdarstellung `isAvailable = 1;` enthält. Es zeigt dabei ausgewählte Verfügbarkeitsfelder an. Diese Prüfung ist vom lokalen Eligibility-Erfolg getrennt.
+The script then checks for up to **120 seconds** whether `com.apple.assistant.backedup / SiriAvailability` contains the text `isAvailable = 1;`. It displays selected availability fields along the way. This check is separate from local eligibility success.
 
-Wenn die Eligibility-Prüfung erfolgreich war, `SiriAvailability` aber nach 120 Sekunden noch nicht bereit ist, meldet das Skript eine erfolgreiche lokale Freischaltung mit weiterhin ausstehender Verfügbarkeit. Es erzwingt dafür **keinen eigenen Fehlercode**. Ein normaler Exit allein bestätigt deshalb weder eine einsatzbereite Siri-AI-Oberfläche noch einen erfolgreichen Test einer Cloud-Anfrage. Der Abschlusstext und die angezeigten Statuswerte müssen ebenfalls betrachtet werden.
+If the eligibility check succeeded but `SiriAvailability` is still not ready after 120 seconds, the script reports successful local activation with availability still pending. It does **not assign a separate error code** for this situation. A normal exit alone therefore confirms neither a ready Siri AI interface nor a successful cloud request test. The final message and displayed status values must also be considered.
 
-## Exit-Codes und Abbruchpfade
+## Exit codes and exit paths
 
-| Code | Bedeutung |
+| Code | Meaning |
 | ---: | --- |
-| `1` | Preflight fehlgeschlagen: Architektur, macOS-Version, vorhandene Siri-AI-App oder Administratorzugriff. |
-| `2` | Die optionale, aber tatsächlich ausgeführte Foundation-Prüfung bestätigte Englisch auch nach drei Versuchen nicht. |
-| `3` | Beim ersten Eligibility-Neustart wurde keine neue PID gefunden. |
-| `4` | Beim zweiten Eligibility-Neustart wurde keine neue PID gefunden. |
-| `5` | Der vollständige lokale Eligibility-Zielzustand wurde nach beiden Versuchen nicht erreicht. |
-| `6` | Der Zielzustand fiel unmittelbar nach dem Setzen der deutschen Konfiguration zurück. |
-| `130` | Der Signal-Handler wurde durch `INT`, `TERM` oder `HUP` ausgelöst. |
+| `1` | Preflight failed: architecture, macOS version, existing Siri AI app or administrator access. |
+| `2` | The optional Foundation check, when actually run, did not confirm English even after three attempts. |
+| `3` | No new PID was found during the first eligibility restart. |
+| `4` | No new PID was found during the second eligibility restart. |
+| `5` | The complete local eligibility target state was not reached after both attempts. |
+| `6` | The target state fell back immediately after setting the German configuration. |
+| `130` | The signal handler was triggered by `INT`, `TERM` or `HUP`. |
 
-Im normalen Abschluss wartet das Skript auf den Log-Stream, entfernt sein temporäres Arbeitsverzeichnis und hält das Terminalfenster bis zur Eingabetaste offen. Die expliziten Fehlerpfade `2` bis `6` verlassen das Skript vorher; der EXIT-Handler übernimmt dabei die Best-Effort-Abschlusskonfiguration und das Aufräumen.
+On normal completion, the script waits for the log stream, removes its temporary working directory and keeps the Terminal window open until Enter is pressed. The explicit error paths `2` through `6` leave the script earlier; the EXIT handler performs the best-effort final configuration and cleanup.
 
-## Reboot und Grenzen der Aussage
+## Reboots and limits of the findings
 
-Nach einem normalen Neustart kann Eligibility wieder zurückfallen. Die Recovery kann anschließend erneut ausgeführt werden. Sie ist keine dauerhafte Freischaltung über alle Neustarts, Systemupdates oder Apple-seitigen Änderungen hinweg.
+Eligibility may fall back after a normal reboot. The recovery can then be run again. It is not a permanent activation across all reboots, system updates or changes made by Apple.
 
-Der beobachtete Zusammenhang zwischen Sprachkonfiguration, CFPrefs, Propagation und neuem `eligibilityd`-Prozess erklärt die gewählte Recovery-Reihenfolge. Das Skript besitzt keine Kontrolle über serverseitige Verfügbarkeit, Kontobedingungen, Asset-Bereitstellung oder spätere interne Neubewertungen. Es gibt keine Zusage, dass zukünftige macOS-Versionen dieselben Schlüssel oder denselben Ablauf verwenden.
+The observed relationship between language configuration, CFPrefs, propagation and a new `eligibilityd` process explains the chosen recovery sequence. The script has no control over server-side availability, account conditions, asset delivery or later internal reassessments. There is no promise that future macOS versions will use the same keys or flow.
 
-## Änderungsumfang und private Diagnosen
+## Scope of changes and private diagnostics
 
-Die Recovery schreibt die genannten Benutzer-Preferences, liest Eligibility-Snapshots, sendet lokale Notifications, beendet die beschriebenen Prozesse und öffnet die vorhandene Siri-AI-App. Sie verändert ausdrücklich nicht:
+The recovery writes the specified user preferences, reads eligibility snapshots, posts local notifications, terminates the described processes and opens the existing Siri AI app. It explicitly does not modify:
 
-- SIP oder Dateien unter `/System`;
-- WARP, Surge, DNS- oder VPN-Konfiguration;
-- `networkserviceproxy` oder `privatecloudcomputed`;
-- Apple-Modelle, Asset-Dateien oder Apple-Binärdateien;
-- Eligibility-Antworten durch direktes Editieren.
+- SIP or files under `/System`;
+- WARP, Surge, DNS or VPN configuration;
+- `networkserviceproxy` or `privatecloudcomputed`;
+- Apple models, asset files or Apple binaries;
+- eligibility answers through direct editing.
 
-Sie ist kein Netzwerk- oder Cloud-Proxy. Die anschließend geöffnete Apple-App kann im Rahmen ihrer normalen Funktion Netzwerkdienste verwenden.
+It is not a network or cloud proxy. The Apple app opened afterward can use network services as part of its normal operation.
 
-Die Recovery erzeugt auf dem Desktop einen `Siri-AI-Post-Boot-<Zeitstempel>.txt`-Report und einen `Siri-AI-Post-Boot-<Zeitstempel>-Propagation.log`. Mit `umask 077` beschränkt sie die normalen Berechtigungen neu angelegter Dateien auf den ausführenden Benutzer. **Diese Dateien bleiben private Diagnosen und gehören nicht in das öffentliche Repository, Releases oder ungeprüfte GitHub-Issues.**
+The recovery creates a `Siri-AI-Post-Boot-<timestamp>.txt` report and a `Siri-AI-Post-Boot-<timestamp>-Propagation.log` on the Desktop. With `umask 077`, it restricts the ordinary permissions of newly created files to the executing user. **These files remain private diagnostics and do not belong in the public repository, releases or unreviewed GitHub issues.**
 
-Reports können lokale Benutzerpfade und weitere personenbezogene oder gerätebezogene Inhalte enthalten. Unified Logs können trotz Prozessfilter zusätzliche private Daten enthalten. Das Skript anonymisiert die Reports nicht; Dateiberechtigungen sind keine Anonymisierung und verhindern auch keine Synchronisation durch eine vorhandene Desktop-Cloud-Sicherung. Für die öffentliche Dokumentation wurden keine Rohlogs, Account-Dumps oder Geräteberichte übernommen.
+Reports can contain local user paths and other personal or device-related information. Unified logs can contain additional private data despite the process filter. The script does not anonymize reports; file permissions do not provide anonymization and do not prevent synchronization by an existing Desktop cloud backup. No raw logs, account dumps or device reports were incorporated into the public documentation.
 
-Das Projekt ist inoffiziell und stammt nicht von Apple. Die Lizenz dieses Repositorys betrifft seinen eigenen Code und seine Dokumentation; sie liefert keine Apple-Software, Modelle oder System-Assets mit.
+This project is unofficial and does not originate from Apple. The repository's license applies to its own code and documentation; it does not bundle Apple software, models or system assets.
