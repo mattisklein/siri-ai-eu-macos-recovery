@@ -12,13 +12,19 @@ Der öffentliche Stand wurde aus einer ausdrücklichen Dateiliste in einem neuen
 - `README.de.md`
 - `LICENSE`
 - `.gitignore`
+- `assets/siri-ai-eu-social-preview.jpg`
 - `START-HERE.txt`
 - `START-HIER.txt`
 - `Siri-AI-EU-Recovery.command`
+- `Siri-AI-Diagnostics.command`
 - `docs/TECHNICAL.md`
 - `docs/TECHNICAL.de.md`
 - `docs/VALIDATION.md`
 - `docs/VALIDATION.de.md`
+- `docs/DIAGNOSTICS.md`
+- `docs/DIAGNOSTICS.de.md`
+
+`assets/siri-ai-eu-social-preview.jpg` ist das Präsentationsbanner am Kopf beider READMEs und für die Social-Preview des Repositories vorgesehen. Es ist eine verkleinerte Kopie (1280×640, JPEG) des Projektbanners. Sein Textinhalt besteht ausschließlich aus generischen, illustrativen Platzhalterwerten (z. B. `macOS 27 (build 27Axxxx)`, `GREYMATTER`, `AMERICIUM`, `SIRI_MODE`); es enthält keine Benutzernamen, echten Build-Nummern, Geräte-/Accountkennungen, persönlichen Pfade oder sonstige private Daten. Die Bildmetadaten wurden auf übliche JPEG-/EXIF-Felder reduziert.
 
 Die Release-Datei `Siri-AI-EU-Recovery-FINAL.zip` wird separat ausgeliefert. Die originale ZIP von v1.0.0 bleibt unverändert und enthält ausschließlich den Ordner `Siri-AI-EU-Recovery/` mit `Siri-AI-EU-Recovery.command` und der deutschen `START-HIER.txt`. Beide Dateien stimmen bytegenau mit den Dateien des Repositories überein. Die englische `START-HERE.txt` steht im Repository zur Verfügung; sie wird nicht in die originale ZIP aufgenommen. `SHA256SUMS` im Release ermöglicht eine Integritätsprüfung:
 

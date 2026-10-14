@@ -1,4 +1,29 @@
-# Siri AI EU macOS Recovery
+<p align="center">
+  <img src="assets/siri-ai-eu-social-preview.jpg" alt="Siri AI EU macOS Recovery – Terminal-style banner showing the recovery flow with GREYMATTER, AMERICIUM and SIRI_MODE eligibility values" width="100%">
+</p>
+
+<h1 align="center">Siri AI EU macOS Recovery</h1>
+
+<p align="center">
+  <strong>Enable Siri AI (Apple Intelligence) on Apple Silicon Macs in the EU / German-language configuration on macOS 27.x</strong>
+</p>
+
+<p align="center">
+  <a href="README.de.md">Deutsch</a> ·
+  <a href="docs/TECHNICAL.md">Technical details</a> ·
+  <a href="docs/DIAGNOSTICS.md">Diagnostics</a> ·
+  <a href="docs/VALIDATION.md">Validation</a> ·
+  <a href="https://github.com/mattisklein/siri-ai-eu-macos-recovery/releases">Releases</a>
+</p>
+
+<p align="center">
+  <img alt="Platform: macOS 27.x Apple Silicon" src="https://img.shields.io/badge/platform-macOS%2027.x%20%7C%20Apple%20Silicon-000000?style=flat-square&logo=apple">
+  <img alt="Status: verified on macOS 27.0.1 build 26A434" src="https://img.shields.io/badge/verified-macOS%2027.0.1%20(26A434)-2ea44f?style=flat-square">
+  <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square">
+  <img alt="Language: English and German documentation" src="https://img.shields.io/badge/docs-EN%20%7C%20DE-blue?style=flat-square">
+</p>
+
+---
 
 **Language:** English | [Deutsch](README.de.md)
 

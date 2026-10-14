@@ -2,6 +2,8 @@
 # Neue öffentliche Dateien müssen hier ausdrücklich freigegeben werden.
 *
 !/.gitignore
+!/assets/
+!/assets/siri-ai-eu-social-preview.jpg
 !/README.md
 !/README.de.md
 !/LICENSE
